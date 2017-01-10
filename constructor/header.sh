@@ -173,9 +173,9 @@ case "$PREFIX" in
 esac
 
 if [[ ($FORCE == 0) && (-e $PREFIX) ]]; then
-    echo "ERROR: File or directory already exists: $PREFIX
+    echo "Directory already exists: $PREFIX
 If you want to update an existing installation, use the -u option." >&2
-    exit 1
+    exit 0
 fi
 
 mkdir -p $PREFIX
