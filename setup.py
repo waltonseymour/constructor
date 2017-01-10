@@ -27,3 +27,19 @@ setup(
     packages = ['constructor', 'constructor.tests'],
     scripts = ['bin/constructor'],
 )
+
+
+if 'install' in sys.argv:
+    import shutil
+
+    if sys.platform == 'win32':
+        sp_dir = join(sys.prefix, 'Lib', 'site-packages')
+        for dn in 'nsis', 'ttf':
+            shutil.copytree(abspath(join('constructor', dn)),
+                            join(sp_dir, 'constructor', dn))
+
+    else:
+        sp_dir = join(sys.prefix, '.local/lib/python%d.%d/site-packages' %
+                                               sys.version_info[:2])
+        shutil.copy(abspath('constructor/header.sh'),
+                    join(sp_dir, 'constructor'))
