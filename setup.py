@@ -39,7 +39,12 @@ if 'install' in sys.argv:
                             join(sp_dir, 'constructor', dn))
 
     else:
-        sp_dir = join(sys.prefix, '.local/lib/python%d.%d/site-packages' %
-                                               sys.version_info[:2])
+        from os.path import expanduser
+        home = expanduser("~")
+        sp_dir = None
+        if sys.platform == 'darwin':
+            sp_dir = join(home, 'Library/Python/%d.%d/lib/python/site-packages' % sys.version_info[:2])
+        else:
+            sp_dir = join(home, '.local/lib/python%d.%d/site-packages' % sys.version_info[:2])
         shutil.copy(abspath('constructor/header.sh'),
                     join(sp_dir, 'constructor'))
