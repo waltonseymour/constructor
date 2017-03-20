@@ -180,6 +180,11 @@ def update_prefix(path, new_prefix, placeholder, mode):
         new_data = data.replace(placeholder.encode('utf-8'),
                                 new_prefix.encode('utf-8'))
     elif mode == 'binary':
+        if on_win:
+            # anaconda-verify will not allow binary placeholder on Windows.
+            # However, since some packages might be created wrong (and a
+            # binary placeholder would break the package, we just skip here.
+            return
         new_data = binary_replace(data, placeholder.encode('utf-8'),
                                   new_prefix.encode('utf-8'))
     else:
@@ -188,7 +193,9 @@ def update_prefix(path, new_prefix, placeholder, mode):
     if new_data == data:
         return
     st = os.lstat(path)
-    with exp_backoff_fn(open, path, 'wb') as fo:
+    # unlink in case the file is memory mapped
+    exp_backoff_fn(os.unlink, path)
+    with open(path, 'wb') as fo:
         fo.write(new_data)
     os.chmod(path, stat.S_IMODE(st.st_mode))
 
@@ -210,6 +217,8 @@ def create_meta(prefix, dist, info_dir, extra_info):
     meta_dir = join(prefix, 'conda-meta')
     if not isdir(meta_dir):
         os.makedirs(meta_dir)
+        with open(join(meta_dir, 'history'), 'w') as fo:
+            fo.write('')
     with open(join(meta_dir, dist + '.json'), 'w') as fo:
         json.dump(meta, fo, indent=2, sort_keys=True)
 
@@ -458,7 +467,7 @@ def main():
     if args:
         p.error('no arguments expected')
 
-    ROOT_PREFIX = opts.root_prefix
+    ROOT_PREFIX = opts.root_prefix.replace('//', '/')
     PKGS_DIR = join(ROOT_PREFIX, 'pkgs')
 
     if opts.post:

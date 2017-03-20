@@ -39,9 +39,12 @@ def read_nsi_tmpl():
 
 
 def find_vs_runtimes(dists, py_version):
-    vs_map = {'2.7': 'vs2008_runtime',
-              '3.4': 'vs2010_runtime',
-              '3.5': 'vs2015_runtime'}
+    vs_map = {
+        '2.7': 'vs2008_runtime',
+        '3.4': 'vs2010_runtime',
+        '3.5': 'vs2015_runtime',
+        '3.6': 'vs2015_runtime',
+    }
     vs_runtime = vs_map.get(py_version[:3])
     return [dist for dist in dists
             if name_dist(dist) in (vs_runtime, 'msvc_runtime')]
@@ -149,17 +152,18 @@ def verify_nsis_install():
         sys.exit("""
 Error: no file %s
     please make sure nsis is installed:
-    > conda install -n root nsis
+    > conda install nsis
 """ % MAKENSIS_EXE)
     out = check_output([MAKENSIS_EXE, '/VERSION'])
     out = out.decode('utf-8').strip()
     print("NSIS version: %s" % out)
-    if 'v3.' in out:
-        untgz_dll = join(sys.prefix, 'NSIS', 'Plugins', 'x86-ansi', 'untgz.dll')
+    for dn in 'x86-unicode', 'x86-ansi', '.':
+        untgz_dll = abspath(join(sys.prefix, 'NSIS',
+                                 'Plugins', dn, 'untgz.dll'))
+        if isfile(untgz_dll):
+            break
     else:
-        untgz_dll = join(sys.prefix, 'NSIS', 'Plugins', 'untgz.dll')
-    if not isfile(untgz_dll):
-         sys.exit("Error: no file %s" % untgz_dll)
+        sys.exit("Error: no file untgz.dll")
 
 
 def create(info):

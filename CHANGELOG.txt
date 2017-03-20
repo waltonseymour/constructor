@@ -1,6 +1,27 @@
-2017-XX-XX   1.5.2:
+2017-03-XX   1.5.5:
 -------------------
-  *
+  * proved access to LD_LIBRARY_PATH in Linux install scripts by stroring it
+    as OLD_LD_LIBRARY_PATH
+  * replace '//' by '/' for install.py --root-prefix option
+
+
+2017-02-16   1.5.4:
+-------------------
+  * skip binary prefix replacement on Windows, #62
+  * add writing empty conda-meta/history upon installation
+
+
+2017-01-31   1.5.3:
+-------------------
+  * update Visual Studio version map to with with Python 3.6 on Windows
+  * add unicode line, update version comment, #61
+  * add --clean (cache) option
+
+
+2017-01-12   1.5.2:
+-------------------
+  * unlink files prior to writing with a new prefix, #58
+  * fix test against NSIS 3.01
 
 
 2017-01-06   1.5.1:
